@@ -9,6 +9,10 @@ export const links: NavLink[] = [
     label: 'Home',
   },
   {
+    href: '/about',  // About
+    label: 'About',
+  },
+  {
     href: '/products',  // Products
     label: 'Products',
   },
@@ -24,4 +28,14 @@ export const links: NavLink[] = [
     href: '/orders',  // Orders
     label: 'Orders',
   },
+  {
+    href: '/admin/sales',  // Dashboard
+    label: 'Dashboard',
+  },
+];
+
+export const adminLinks: NavLink[] = [
+  { href: '/admin/sales', label: 'sales' },
+  { href: '/admin/products', label: 'my products' },
+  { href: '/admin/products/create', label: 'add products' },
 ];
