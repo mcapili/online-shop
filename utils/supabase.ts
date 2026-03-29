@@ -1,7 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-import db from './db';
-import { revalidatePath } from 'next/cache';
-import { getAdminUser, renderError } from './actions';
 
 const bucket = 'prime-bucket';
 
