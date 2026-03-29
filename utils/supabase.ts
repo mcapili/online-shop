@@ -1,4 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
+import db from './db';
+import { revalidatePath } from 'next/cache';
+import { getAdminUser, renderError } from './actions';
 
 const bucket = 'prime-bucket';
 
@@ -20,4 +23,11 @@ export const uploadImage = async (image: File) => {
     });
   if (!data) throw new Error('Image upload failed');
   return supabase.storage.from(bucket).getPublicUrl(newName).data.publicUrl;
+};
+
+export const deleteImage = async (url: string) => {
+  const imageName = url.split('/').pop();
+  console.log('Deleting image:', imageName);
+  if (!imageName) throw new Error('Invalid URL');
+  return supabase.storage.from(bucket).remove([imageName]);
 };

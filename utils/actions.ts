@@ -4,9 +4,10 @@ import  db from '@/utils/db';
 import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { imageSchema, productSchema, validateWithZodSchema } from './schemas';
-import { uploadImage } from './supabase';
+import { deleteImage, uploadImage } from './supabase';
+import { revalidatePath } from 'next/cache';
 
-const renderError = (error: unknown): { message: string } => {
+export const renderError = (error: unknown): { message: string } => {
   return {
     message: error instanceof Error ? error.message : 'An error occurred',
   };
@@ -83,7 +84,7 @@ export const fetchSingleProduct = async (productId: string) => {
   return product;
 };
 
-const getAdminUser = async () => {
+export const getAdminUser = async () => {
   const user = await getAuthUser();
   if (user.id !== process.env.ADMIN_USER_ID) redirect('/');
   return user;
@@ -97,4 +98,22 @@ export const fetchAdminProducts = async () => {
     },
   });
   return products;
+};
+
+export const deleteProductAction = async (prevState: { productId: string }) => {
+  const { productId } = prevState;
+  await getAdminUser();
+
+  try {
+    const product = await db.product.delete({
+      where: {
+        id: productId,
+      },
+    });
+    await deleteImage(product.image);
+    revalidatePath('/admin/products');
+    return { message: 'Product removed' };
+  } catch (error) {
+    return renderError(error);
+  }
 };
