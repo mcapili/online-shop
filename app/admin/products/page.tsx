@@ -42,7 +42,8 @@ async function ItemsPage() {
                   <Link href={`/admin/products/${productId}/edit`}>
                     <IconButton actionType='edit'></IconButton>
                   </Link>
-                  <DeleteProduct productId={productId} />
+                  <DeleteProduct productId={productId} productName={name} 
+                  />
                 </TableCell>
               </TableRow>
             );

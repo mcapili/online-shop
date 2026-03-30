@@ -16,9 +16,8 @@ import FormContainer from "@/components/form/FormContainer";
 import { deleteProductAction } from "@/utils/actions";
 import { useToast } from "@/components/ui/use-toast";
 
-export default function DeleteProduct({ productId }: { productId: string }) {
+export default function DeleteProduct({ productId, productName }: { productId: string; productName: string }) {
   const { toast } = useToast();
-
   const deleteProduct = async (prevState: any, formData: FormData) => {
     try {
       const result = await deleteProductAction({ productId });
@@ -47,7 +46,7 @@ export default function DeleteProduct({ productId }: { productId: string }) {
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Product</AlertDialogTitle>
+          <AlertDialogTitle>Delete {productName}</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete this product? This action cannot be undone.
           </AlertDialogDescription>
