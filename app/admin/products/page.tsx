@@ -1,10 +1,10 @@
 import { IconButton } from "@/components/form/Buttons";
-import FormContainer from "@/components/form/FormContainer";
 import EmptyList from "@/components/global/EmptyList";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { deleteProductAction, fetchAdminProducts } from "@/utils/actions";
 import { formatCurrency } from "@/utils/format";
 import Link from "next/link";
+import DeleteProduct from "./DeleteProduct";
 
 async function ItemsPage() {
   const items = await fetchAdminProducts();
@@ -42,7 +42,6 @@ async function ItemsPage() {
                   <Link href={`/admin/products/${productId}/edit`}>
                     <IconButton actionType='edit'></IconButton>
                   </Link>
-                  {/* TODO: add confirmation before delete */}
                   <DeleteProduct productId={productId} />
                 </TableCell>
               </TableRow>
@@ -53,13 +52,5 @@ async function ItemsPage() {
     </section>
   );
 }
-export default ItemsPage;
 
-function DeleteProduct({ productId }: { productId: string }) {
-  const deleteProduct = deleteProductAction.bind(null, { productId });
-  return (
-    <FormContainer action={deleteProduct}>
-      <IconButton actionType='delete' />
-    </FormContainer>
-  );
-}
+export default ItemsPage;
