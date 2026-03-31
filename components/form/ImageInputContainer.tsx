@@ -41,7 +41,7 @@ function ImageInputContainer(props: ImageInputContainerProps) {
           <FormContainer action={action}>
             {props.children}
             <ImageInput />
-            <SubmitButton size='sm' />
+            <SubmitButton size='sm' reloadLabel='Updating image...' />
           </FormContainer>
         </div>
       )}

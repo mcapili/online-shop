@@ -12,12 +12,14 @@ type SubmitButtonProps = {
   className?: string;
   text?: string;
   size?: btnSize;
+  reloadLabel?: string;
 };
 
 export function SubmitButton({
   className = '',
   text = 'submit',
   size = 'lg',
+  reloadLabel
 }: SubmitButtonProps) {
   const { pending } = useFormStatus();
   return (
@@ -30,7 +32,7 @@ export function SubmitButton({
       {pending ? (
         <>
           <ReloadIcon className='mr-2 h-4 w-4 animate-spin' />
-          Submitting...
+          { reloadLabel || 'Submitting...'}
         </>
       ) : (
         text

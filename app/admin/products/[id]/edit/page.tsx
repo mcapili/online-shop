@@ -20,7 +20,7 @@ async function EditProductPage({ params }: { params: { id: string } }) {
           action={updateProductImageAction}
           name={name}
           image={product.image}
-          text='update image'
+          text='Update Image'
         >
           <input type='hidden' name='id' value={id} />
           <input type='hidden' name='url' value={product.image} />

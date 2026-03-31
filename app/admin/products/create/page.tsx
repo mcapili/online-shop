@@ -42,8 +42,7 @@ function CreateProduct() {
           <div className='mt-6'>
             <CheckBoxInput name='featured' label='featured' />
           </div>
-
-          <SubmitButton text='Submit' className='mt-8' />
+          <SubmitButton text='Submit' className='mt-8' reloadLabel="Adding product..." />
           {/* TODO clear form after submit and show success message */}
         </FormContainer>
       </div>
