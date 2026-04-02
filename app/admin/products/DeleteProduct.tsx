@@ -40,9 +40,7 @@ export default function DeleteProduct({ productId, productName }: { productId: s
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <button type="button">
-          <IconButton actionType="delete" />
-        </button>
+        <IconButton actionType="delete" />
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

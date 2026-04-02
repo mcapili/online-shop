@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { LuTrash2 } from "react-icons/lu";
 import { FaRegEdit } from "react-icons/fa";
+import { forwardRef } from "react";
 
 type btnSize = 'default' | 'lg' | 'sm';
 
@@ -41,30 +42,39 @@ export function SubmitButton({
   )
 }
 
-type actionType = 'edit' | 'delete';
-export const IconButton = ({ actionType }: { actionType: actionType }) => {
-  const { pending } = useFormStatus();
+type ActionType = "edit" | "delete";
 
-  const renderIcon = () => {
-    switch (actionType) {
-      case 'edit':
-        return <FaRegEdit />;
-      case 'delete':
-        return <LuTrash2 />;
-      default:
-        const never: never = actionType;
-        throw new Error(`Invalid action type: ${never}`);
-    }
-  };
+interface IconButtonProps extends React.ComponentProps<typeof Button> {
+  actionType: ActionType;
+}
 
-  return (
-    <Button
-      type='submit'
-      size='icon'
-      variant='link'
-      className='p-2 cursor-pointer'
-    >
-      {pending ? <ReloadIcon className=' animate-spin' /> : renderIcon()}
-    </Button>
-  );
-};
+export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
+  ({ actionType, className, ...props }, ref) => {
+    const { pending } = useFormStatus();
+
+    const renderIcon = () => {
+      switch (actionType) {
+        case "edit":
+          return <FaRegEdit />;
+        case "delete":
+          return <LuTrash2 />;
+        default:
+          return null;
+      }
+    };
+
+    return (
+      <Button
+        ref={ref}              // ✅ forward ref
+        type="submit"
+        size="icon"
+        variant="link"
+        className={`p-2 cursor-pointer ${className ?? ""}`}
+        {...props}             // ✅ forward props (onClick, aria-* etc.)
+      >
+        {pending ? <ReloadIcon className="animate-spin" /> : renderIcon()}
+      </Button>
+    );
+  }
+);
+IconButton.displayName = "IconButton";
