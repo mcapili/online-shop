@@ -55,7 +55,7 @@ async function EditProductPage({ params }: { params: { id: string } }) {
               defaultChecked={featured}
             />
           </div>
-          <SubmitButton text='update product' className='mt-8' />
+          <SubmitButton text='update product' className='mt-8' reloadLabel="Updating..." />
         </FormContainer>
       </div>
     </section>
