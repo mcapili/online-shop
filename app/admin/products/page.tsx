@@ -1,7 +1,7 @@
 import { IconButton } from "@/components/form/Buttons";
 import EmptyList from "@/components/global/EmptyList";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { deleteProductAction, fetchAdminProducts } from "@/utils/actions";
+import { fetchAdminProducts } from "@/utils/actions";
 import { formatCurrency } from "@/utils/format";
 import Link from "next/link";
 import DeleteProduct from "./DeleteProduct";
