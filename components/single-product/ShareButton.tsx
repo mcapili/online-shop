@@ -9,8 +9,6 @@ import {
     LinkedinIcon,
     EmailShareButton,
     EmailIcon,
-    FacebookShareButton,
-    FacebookIcon,
     XIcon,
 } from "react-share";
 
@@ -34,9 +32,6 @@ function ShareButton({ productId, name }: { productId: string; name: string }) {
                 <XShareButton url={shareLink} title={name}>
                     <XIcon size={32} round />
                 </XShareButton>
-                <FacebookShareButton url={shareLink} title={name}>
-                    <FacebookIcon size={32} round />
-                </FacebookShareButton>
                 <LinkedinShareButton url={shareLink} title={name}>
                     <LinkedinIcon size={32} round />
                 </LinkedinShareButton>
