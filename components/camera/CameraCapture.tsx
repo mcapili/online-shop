@@ -1,49 +1,61 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
-import Image from 'next/image';
+import { useRef, useState, useEffect, useCallback } from 'react';
 
 export default function CameraTest() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user'); // Default to front camera
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
   const [errorLog, setErrorLog] = useState<string | null>(null);
 
-  // 1. Initialize camera stream on mount
-  useEffect(() => {
-    let activeStream: MediaStream | null = null;
+  // Wrap camera initialization in a reusable function
+  const startCamera = useCallback(async (mode: 'user' | 'environment') => {
+    try {
+      setErrorLog(null);
 
-    async function startCamera() {
-      try {
-        setErrorLog(null);
-        const mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user' }, // Use 'environment' for rear mobile camera
-          audio: false,
-        });
-
-        activeStream = mediaStream;
-        setStream(mediaStream);
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
-        }
-      } catch (err: any) {
-        console.error("Camera access failed:", err);
-        setErrorLog(`${err.name}: ${err.message}`);
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: mode },
+        audio: false,
+      });
+      
+      setStream(mediaStream);
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
       }
+    } catch (err: any) {
+      console.error("Camera access failed:", err);
+      setErrorLog(`${err.name}: ${err.message}`);
     }
-
-    startCamera();
-
-    // Clean up hardware usage when navigating away
-    return () => {
-      if (activeStream) {
-        activeStream.getTracks().forEach((track) => track.stop());
-      }
-    };
   }, []);
 
-  // 2. Capture frame locally without database uploads
+  // Safely stop all tracks on the active stream
+  const stopCurrentStream = useCallback(() => {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+      setStream(null);
+    }
+  }, [stream]);
+
+  // Restart camera whenever the facingMode state changes
+  useEffect(() => {
+    startCamera(facingMode);
+
+    return () => {
+      // Cleanup when component unmounts
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [facingMode]); // Re-runs every time facingMode updates
+
+  // Function to switch camera states
+  const toggleCamera = () => {
+    stopCurrentStream(); // 1. Kill current stream hardware access
+    setFacingMode((prev) => (prev === 'user' ? 'environment' : 'user')); // 2. Trigger re-render with new lens
+  };
+
   const captureLocalPhoto = () => {
     if (!videoRef.current || !canvasRef.current) return;
 
@@ -53,21 +65,13 @@ export default function CameraTest() {
 
     if (!ctx) return;
 
-    // Lock canvas dimensions to current video frame size
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-
-    // Draw the static frame matrix onto the canvas
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Convert canvas matrix to a temporary browser local URL object
     canvas.toBlob((blob) => {
       if (!blob) return;
-      
-      // Clean up previous local URL memory leaks if they exist
-      if (localPreviewUrl) {
-        URL.revokeObjectURL(localPreviewUrl);
-      }
+      if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
 
       const localUrl = URL.createObjectURL(blob);
       setLocalPreviewUrl(localUrl);
@@ -76,30 +80,41 @@ export default function CameraTest() {
 
   return (
     <div className="flex flex-col items-center gap-6 p-6 max-w-md mx-auto">
-      <h2 className="text-xl font-bold">Camera Capability Test</h2>
+      <h2 className="text-xl font-bold">Camera Lens Toggle Test</h2>
 
-      {/* Error Alert Display */}
       {errorLog && (
         <div className="p-3 bg-red-100 text-red-700 rounded-md text-sm w-full">
           <strong>Hardware Error:</strong> {errorLog}
         </div>
       )}
 
-      {/* Live Video Preview Box */}
       <div className="flex flex-col items-center gap-2 w-full">
-        <span className="text-xs text-gray-500 font-mono">LIVE CAMERA FEED</span>
+        <div className="flex justify-between items-center w-full">
+          <span className="text-xs text-gray-500 font-mono">
+            CURRENT: {facingMode.toUpperCase()} CAMERA
+          </span>
+          {/* Lens Switcher Button */}
+          <button 
+            onClick={toggleCamera}
+            className="text-xs px-2 py-1 bg-gray-200 hover:bg-gray-300 rounded font-medium transition-colors"
+          >
+            🔄 Switch Lens
+          </button>
+        </div>
+
         <video
           ref={videoRef}
           autoPlay
           playsInline
-          className="w-full rounded-lg bg-black transform -scale-x-100 border border-gray-300" 
+          /* Only apply mirror effect CSS class when utilizing the front selfie camera */
+          className={`w-full rounded-lg bg-black border border-gray-300 ${
+            facingMode === 'user' ? 'transform -scale-x-100' : ''
+          }`} 
         />
       </div>
 
-      {/* Hidden Canvas Used Only For Framing Processing */}
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* Hardware Trigger Action */}
       <button
         onClick={captureLocalPhoto}
         disabled={!!errorLog}
@@ -108,16 +123,12 @@ export default function CameraTest() {
         Trigger Snapshot
       </button>
 
-      {/* Local Capture Testing Preview Output */}
       {localPreviewUrl && (
         <div className="flex flex-col items-center gap-2 w-full border-t pt-4 mt-2">
-          <span className="text-xs text-emerald-600 font-bold font-mono">CAPTURED IMAGE BLOB RESULTS</span>
-          <Image
-            src={localPreviewUrl as string}
-            alt="Local Test Snapshot File"
-            width={640}
-            height={480}
-            unoptimized
+          <span className="text-xs text-emerald-600 font-bold font-mono">CAPTURED IMAGE</span>
+          <img 
+            src={localPreviewUrl} 
+            alt="Local Test Snapshot File" 
             className="w-full rounded-lg border border-emerald-400 object-cover"
           />
           <button 
