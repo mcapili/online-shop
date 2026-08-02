@@ -8,7 +8,7 @@ export default function CameraTest() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
     const [stream, setStream] = useState<MediaStream | null>(null);
-    const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user'); // Default to front camera
+    const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment'); // Default to front camera
     const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
     const [errorLog, setErrorLog] = useState<string | null>(null);
 
