@@ -9,6 +9,7 @@ import { createProductAction } from "@/utils/actions";
 import { faker } from '@faker-js/faker';
 
 
+
 function CreateProduct() {
   const name = faker.commerce.productName();
   const company = faker.company.name();
